@@ -12,6 +12,7 @@ const RoomList = () => {
     type: "",
     isAvailable: true,
   });
+  const [selectedDates, setSelectedDates] = useState({});
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -34,6 +35,7 @@ const RoomList = () => {
         setLoading(false);
       });
   }, []);
+
   const handleEdit = (room) => {
     setEditingRoom(room._id);
     setEditedRoomData({
@@ -42,6 +44,7 @@ const RoomList = () => {
       isAvailable: room.isAvailable,
     });
   };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setEditedRoomData((prevData) => ({
@@ -68,8 +71,60 @@ const RoomList = () => {
         console.error("Error saving room update:", error);
       });
   };
+
   const handleCancelEdit = () => {
     setEditingRoom(null);
+  };
+
+  const handleReserve = (roomId) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Please login to make a reservation.");
+      return;
+    }
+    const { startDate, endDate } = selectedDates[roomId] || {};
+
+    if (!startDate || !endDate) {
+      alert("Please select both start and end dates.");
+      return;
+    }
+
+    try {
+      axios
+        .post(`${process.env.REACT_APP_BASE_URL}/api/reservations`, {
+          room: roomId,
+          startDate: new Date(startDate).toISOString(),
+          endDate: new Date(endDate).toISOString(),
+        })
+        .then((response) => {
+          alert("Reservation successful!");
+          setRooms(
+            rooms.map((room) =>
+              room._id === roomId ? { ...room, isAvailable: false } : room
+            )
+          );
+        })
+        .catch((error) => {
+          console.error("Error creating reservation:", error);
+          alert(
+            error.response?.data?.message || "Failed to create reservation."
+          );
+        });
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      alert("Failed to process reservation. Please log in again.");
+    }
+  };
+
+  const handleDateChange = (roomId, field, value) => {
+    setSelectedDates((prevDates) => ({
+      ...prevDates,
+      [roomId]: {
+        ...prevDates[roomId],
+        [field]: value,
+      },
+    }));
   };
 
   if (loading) {
@@ -180,8 +235,43 @@ const RoomList = () => {
                     Added on: {new Date(room.createdAt).toLocaleDateString()}
                   </p>
 
+                  {room.isAvailable && (
+                    <div className="mb-4">
+                      <label className="block text-gray-700">Start Date</label>
+                      <input
+                        type="date"
+                        value={selectedDates[room._id]?.startDate || ""}
+                        onChange={(e) =>
+                          handleDateChange(
+                            room._id,
+                            "startDate",
+                            e.target.value
+                          )
+                        }
+                        className="mt-2 p-2 border border-gray-300 rounded w-full"
+                      />
+                    </div>
+                  )}
+
+                  {room.isAvailable && (
+                    <div className="mb-4">
+                      <label className="block text-gray-700">End Date</label>
+                      <input
+                        type="date"
+                        value={selectedDates[room._id]?.endDate || ""}
+                        onChange={(e) =>
+                          handleDateChange(room._id, "endDate", e.target.value)
+                        }
+                        className="mt-2 p-2 border border-gray-300 rounded w-full"
+                      />
+                    </div>
+                  )}
+
                   {room.isAvailable ? (
-                    <button className="mt-4 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+                    <button
+                      onClick={() => handleReserve(room._id)}
+                      className="mt-4 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                    >
                       Reserve
                     </button>
                   ) : (

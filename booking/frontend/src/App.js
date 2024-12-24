@@ -45,7 +45,7 @@ const App = () => {
           Hotel Room Booking
           {role && (
             <div>
-              Hoşgeldin
+              Welcome
               <span className="text-red-600">
                 {" "}
                 {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -65,7 +65,7 @@ const App = () => {
 
       <div className="">
         {!token ? (
-          <div className="flex justify-center gap-x-12">
+          <div className="flex justify-center gap-x-12 ">
             <div>
               <Register />
             </div>
@@ -75,7 +75,6 @@ const App = () => {
           </div>
         ) : (
           <>
-            {/* <div>Başarıyla giriş yapıldı. </div> */}
             <div>
               <RoomList />
             </div>

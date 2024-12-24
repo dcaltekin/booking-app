@@ -7,9 +7,10 @@ const RoomList = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/rooms")
+      .get(`${process.env.REACT_APP_BASE_URL}/api/rooms`)
       .then((response) => {
         setRooms(response.data);
+
         setLoading(false);
       })
       .catch((error) => {

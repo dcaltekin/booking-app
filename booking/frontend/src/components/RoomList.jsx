@@ -50,6 +50,24 @@ const RoomList = () => {
     }));
   };
 
+  const handleSaveEdit = () => {
+    axios
+      .put(
+        `${process.env.REACT_APP_BASE_URL}/api/rooms/${editingRoom}`,
+        editedRoomData
+      )
+      .then((response) => {
+        setRooms(
+          rooms.map((room) =>
+            room._id === editingRoom ? { ...room, ...editedRoomData } : room
+          )
+        );
+        setEditingRoom(null);
+      })
+      .catch((error) => {
+        console.error("Error saving room update:", error);
+      });
+  };
   const handleCancelEdit = () => {
     setEditingRoom(null);
   };
@@ -107,9 +125,9 @@ const RoomList = () => {
                       onChange={handleChange}
                       className="w-full mt-2 p-2 border border-gray-300 rounded"
                     >
-                      <option value="basic">Basic</option>
-                      <option value="premium">Premium</option>
-                      <option value="suite">Suite</option>
+                      <option value="Basic">Basic</option>
+                      <option value="Premium">Premium</option>
+                      <option value="Suite">Suite</option>
                     </select>
                   </div>
                   <div className="mb-4">
@@ -129,7 +147,10 @@ const RoomList = () => {
                     />
                   </div>
                   <div className="flex justify-between">
-                    <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                    <button
+                      onClick={handleSaveEdit}
+                      className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                    >
                       Save
                     </button>
                     <button

@@ -10,7 +10,7 @@ const Login = ({ setToken }) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        `${process.env.REACT_APP_BASE_URL}/api/auth/login`,
         { username, password }
       );
       const { token } = response.data;

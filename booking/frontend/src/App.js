@@ -65,14 +65,14 @@ const App = () => {
 
       <div className="">
         {!token ? (
-          <>
+          <div className="flex justify-center gap-x-12">
             <div>
               <Register />
             </div>
             <div>
               <Login setToken={handleSetToken} />
             </div>
-          </>
+          </div>
         ) : (
           <>
             {/* <div>Başarıyla giriş yapıldı. </div> */}
